@@ -1,0 +1,38 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Author {
+  id: ID!
+  name: String!
+}
+
+type Book {
+  library: Library!
+  id: ID!
+  title: String!
+  author: Author
+}
+
+input BookInput {
+  id: String!
+  title: String!
+  authorId: String!
+  libraryId: String!
+}
+
+type Library {
+  id: ID!
+  name: String!
+}
+
+type Mutation {
+  addBook(book: BookInput!): Book!
+}
+
+type Query {
+  books: [Book!]!
+  book(id: String!): Book
+  libraries: [Library!]!
+}

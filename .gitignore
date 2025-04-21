@@ -1,0 +1,5 @@
+/GraphQLBlazorClient/obj
+/.idea
+/GraphQLBlazorClient/bin
+/GraphQLBlazorClient/node_modules
+/GraphQLBlazorClient/.config

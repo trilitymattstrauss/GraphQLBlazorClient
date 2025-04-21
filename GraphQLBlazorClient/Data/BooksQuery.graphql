@@ -1,0 +1,11 @@
+query ExampleQuery {
+    books {
+        author {
+            name
+        }
+        library {
+            name
+        }
+        title
+    }
+}
