@@ -1,7 +1,4 @@
-schema {
-  query: Query
-  mutation: Mutation
-}
+directive @defer(label: String, if: Boolean! = true) on FRAGMENT_SPREAD | INLINE_FRAGMENT
 
 type Author {
   id: ID!
@@ -33,6 +30,7 @@ type Mutation {
 
 type Query {
   books: [Book!]!
+  authors: [Author!]!
   book(id: String!): Book
   libraries: [Library!]!
 }

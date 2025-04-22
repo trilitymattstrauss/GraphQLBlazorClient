@@ -5,13 +5,46 @@
 
 <PageTitle>Home</PageTitle>
 
-<div class="flex">
-    <div class="w-25 flex-1">
+<div class="grid grid-cols-6 gap-4">
+    <div class="col-span-1">
         <button
             class="w-100 mt-1 mb-1 font-bold py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-700"
-            @onclick="GetBooks">Books</button>
+            @onclick="GetBooks">
+            Get Books
+        </button>
+        <div class="grid grid-cols-6 gap-4 border-2 p-2">
+            <label class="col-span-1">Title</label>
+            <input type="text" @bind="_title" class="border col-span-5"/>
+            <label class="col-span-1">Author</label>
+            <select @bind="_authorId" class="border col-span-5">
+                <option></option>
+                @if (_authors != null)
+                {
+                    @foreach (var author in _authors)
+                    {
+                        <option value="@author.Id">@author.Name</option>
+                    }
+                }
+            </select>
+            <label class="col-span-1">Library</label>
+            <select @bind="_libraryId" class="border col-span-5">
+                <option></option>
+                @if (_libraries != null)
+                {
+                    @foreach (var library in _libraries)
+                    {
+                        <option value="@library.Id">@library.Name</option>
+                    }
+                }
+            </select>
+            <button
+                class="col-span-2 col-start-5 mt-1 mb-1 font-bold py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-700"
+                @onclick="AddBook">
+                Add Book
+            </button>
+        </div>
     </div>
-    <div class="flex-4">
+    <div class="col-span-5">
         <ul>
             @if (_books != null)
             {
@@ -26,15 +59,48 @@
 
 @code {
 
-    IReadOnlyList<IExampleQuery_Books>? _books;
+    IReadOnlyList<IGetBooks_Books>? _books;
+    IReadOnlyList<IGetLibraries_Libraries>? _libraries;
+    IReadOnlyList<IGetAuthors_Authors> _authors;
+
+    string _authorId;
+    string _libraryId;
+    string _title;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var librariesResult = await client.GetLibraries.ExecuteAsync();
+        librariesResult.EnsureNoErrors();
+
+        _libraries = librariesResult.Data?.Libraries;
+        
+        var authorsResult = await client.GetAuthors.ExecuteAsync();
+        authorsResult.EnsureNoErrors();
+
+        _authors = authorsResult.Data?.Authors;
+    }
 
     async Task GetBooks()
     {
-        Console.WriteLine("Hello World!");
-        var result = await client.ExampleQuery.ExecuteAsync();
+        var result = await client.GetBooks.ExecuteAsync();
         result.EnsureNoErrors();
 
         _books = result.Data?.Books;
     }
 
+    async Task AddBook()
+    {
+        var id = Guid.NewGuid().ToString();
+        var input = new BookInput
+        {
+            Id = id,
+            AuthorId = _authorId,
+            LibraryId = _libraryId,
+            Title = _title
+        };
+
+        await client.AddBook.ExecuteAsync(input);
+
+        await GetBooks();
+    }
 }
