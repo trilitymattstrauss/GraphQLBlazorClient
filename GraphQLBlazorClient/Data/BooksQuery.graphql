@@ -1,5 +1,5 @@
-query GetBooks {
-    books {
+query GetBooks($input: BooksQueryInput) {
+    books(input: $input) {
         author {
             name
         }
