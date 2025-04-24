@@ -7,12 +7,51 @@
 
 <div class="grid grid-cols-6 gap-4">
     <div class="col-span-1">
-        <button
-            class="w-100 mt-1 mb-1 font-bold py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-700"
-            @onclick="GetBooks">
-            Get Books
-        </button>
-        <div class="grid grid-cols-6 gap-4 border-2 p-2">
+        <div class="grid grid-cols-6 gap-4 border-2 p-2 rounded-2xl border-blue-500 bg-gray-200">
+            <label class="col-span-1">Title</label>
+            <input type="text" @bind="_queryTitle" class="border col-span-5"/>
+            <label class="col-span-1">Author</label>
+            <select @bind="_queryAuthor" class="border col-span-5">
+                <option></option>
+                @if (_authors != null)
+                {
+                    @foreach (var author in _authors)
+                    {
+                        <option value="@author.Id">@author.Name</option>
+                    }
+                }
+            </select>
+            <label class="col-span-1">Library</label>
+            <select @bind="_queryLibrary" class="border col-span-5">
+                <option></option>
+                @if (_libraries != null)
+                {
+                    @foreach (var library in _libraries)
+                    {
+                        <option value="@library.Id">@library.Name</option>
+                    }
+                }
+            </select>
+            <button
+                class="col-span-2 col-start-5 mt-1 mb-1 font-bold py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-700"
+                @onclick="GetBooks">
+                Get Books
+            </button>
+        </div>
+    </div>
+    <div class="col-span-5 border-2 p-2 rounded-2xl border-blue-500 bg-gray-200">
+        @if (_books != null)
+        {
+            <div class="flex">
+            @foreach (var book in _books)
+            {
+                <BookCard AuthorName="@book.Author.Name" BookTitle="@book.Title" LibraryName="@book.Library.Name" />
+            }
+            </div>
+        }
+    </div>
+    <div class="col-span-1">
+        <div class="grid grid-cols-6 gap-4 border-2 p-2 rounded-2xl border-blue-500 bg-gray-200">
             <label class="col-span-1">Title</label>
             <input type="text" @bind="_title" class="border col-span-5"/>
             <label class="col-span-1">Author</label>
@@ -44,14 +83,11 @@
             </button>
         </div>
     </div>
-    <div class="col-span-5">
+    <div class="col-span-5 border-2 p-2 rounded-2xl border-blue-500 bg-gray-200">
         <ul>
-            @if (_books != null)
+            @if (_book != null)
             {
-                @foreach (var book in _books)
-                {
-                    <li>@book.Title By @book.Author.Name Located in @book.Library.Name</li>
-                }
+                <p>@_book.Title By @_book.Author.Name Located in @_book.Library.Name</p>
             }
         </ul>
     </div>
@@ -62,10 +98,14 @@
     IReadOnlyList<IGetBooks_Books>? _books;
     IReadOnlyList<IGetLibraries_Libraries>? _libraries;
     IReadOnlyList<IGetAuthors_Authors> _authors;
+    IGetBook_Book _book;
 
     string _authorId;
     string _libraryId;
     string _title;
+    string _queryTitle;
+    string _queryAuthor;
+    string _queryLibrary;
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,5 +142,18 @@
         await client.AddBook.ExecuteAsync(input);
 
         await GetBooks();
+    }
+
+    async Task GetBookById(string id)
+    {
+        var input = new BookQueryInput
+        {
+            Id = id
+        };
+
+        var result = await client.GetBook.ExecuteAsync(input);
+        result.EnsureNoErrors();
+
+        _book = result.Data?.Book;
     }
 }

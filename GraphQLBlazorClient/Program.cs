@@ -1,4 +1,4 @@
-using BlazorPlayground.Components;
+using GraphQLBlazorClient.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 

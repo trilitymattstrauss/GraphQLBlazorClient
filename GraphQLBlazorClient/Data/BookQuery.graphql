@@ -1,0 +1,11 @@
+query GetBook($input: BookQueryInput!) {
+    book(input: $input) {
+        author {
+            name
+        }
+        library {
+            name
+        }
+        title
+    }
+}

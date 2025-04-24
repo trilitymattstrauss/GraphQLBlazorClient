@@ -19,6 +19,18 @@ input BookInput {
   libraryId: String!
 }
 
+input BookQueryInput {
+  id: String
+  title: String
+}
+
+input BooksQueryInput {
+  id: String
+  title: String
+  authorId: String
+  libraryId: String
+}
+
 type Library {
   id: ID!
   name: String!
@@ -29,8 +41,8 @@ type Mutation {
 }
 
 type Query {
-  books: [Book!]!
+  books(input: BooksQueryInput): [Book!]!
   authors: [Author!]!
-  book(id: String!): Book
+  book(input: BookQueryInput!): Book
   libraries: [Library!]!
 }
