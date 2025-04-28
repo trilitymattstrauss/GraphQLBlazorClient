@@ -1,6 +1,6 @@
 ﻿@page "/"
 @using GraphQLExample.GraphQL
-@inject GraphQLExampleClient client
+@inject GraphQLExampleClient Client
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
@@ -45,7 +45,7 @@
             <div class="flex">
             @foreach (var book in _books)
             {
-                <BookCard AuthorName="@book.Author.Name" BookTitle="@book.Title" LibraryName="@book.Library.Name" />
+                <BookCard AuthorName="@book.Author?.Name" BookTitle="@book.Title" LibraryName="@book.Library.Name" />
             }
             </div>
         }
@@ -87,34 +87,33 @@
         <ul>
             @if (_book != null)
             {
-                <BookCard AuthorName="@_book.Author.Name" BookTitle="@_book.Title" LibraryName="@_book.Library.Name" />
+                <BookCard AuthorName="@_book.Author?.Name" BookTitle="@_book.Title" LibraryName="@_book.Library.Name" />
             }
         </ul>
     </div>
 </div>
 
 @code {
-
     IReadOnlyList<IGetBooks_Books>? _books;
     IReadOnlyList<IGetLibraries_Libraries>? _libraries;
-    IReadOnlyList<IGetAuthors_Authors> _authors;
-    IGetBook_Book _book;
+    IReadOnlyList<IGetAuthors_Authors>? _authors;
+    IGetBook_Book? _book;
 
-    string _authorId;
-    string _libraryId;
-    string _title;
-    string _queryTitle;
-    string _queryAuthor;
-    string _queryLibrary;
+    string? _authorId;
+    string? _libraryId;
+    string? _title;
+    string? _queryTitle;
+    string? _queryAuthor;
+    string? _queryLibrary;
 
     protected override async Task OnInitializedAsync()
     {
-        var librariesResult = await client.GetLibraries.ExecuteAsync();
+        var librariesResult = await Client.GetLibraries.ExecuteAsync();
         librariesResult.EnsureNoErrors();
 
         _libraries = librariesResult.Data?.Libraries;
         
-        var authorsResult = await client.GetAuthors.ExecuteAsync();
+        var authorsResult = await Client.GetAuthors.ExecuteAsync();
         authorsResult.EnsureNoErrors();
 
         _authors = authorsResult.Data?.Authors;
@@ -127,7 +126,7 @@
         input.AuthorId = !string.IsNullOrEmpty(_queryAuthor) ? _queryAuthor : null;
         input.LibraryId = !string.IsNullOrEmpty(_queryLibrary) ? _queryLibrary : null;
 
-        var result = await client.GetBooks.ExecuteAsync(input);
+        var result = await Client.GetBooks.ExecuteAsync(input);
 
         result.EnsureNoErrors();
 
@@ -145,7 +144,7 @@
             Title = _title
         };
 
-        await client.AddBook.ExecuteAsync(input);
+        await Client.AddBook.ExecuteAsync(input);
         
         await GetBookById(id);
     }
@@ -157,7 +156,7 @@
             Id = id
         };
 
-        var result = await client.GetBook.ExecuteAsync(input);
+        var result = await Client.GetBook.ExecuteAsync(input);
         result.EnsureNoErrors();
 
         _book = result.Data?.Book;
