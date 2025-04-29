@@ -1,4 +1,5 @@
 using GraphQLBlazorClient.Components;
+using GraphQLBlazorClient.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ builder.Services.AddRazorComponents()
 builder.Services
     .AddGraphQLExampleClient()
     .ConfigureHttpClient(client => client.BaseAddress = new Uri("http://localhost:4000"));
+builder.Services.AddSingleton<GraphService>();
 
 var app = builder.Build();
 

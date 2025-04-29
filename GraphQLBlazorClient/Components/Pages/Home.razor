@@ -1,6 +1,7 @@
 ﻿@page "/"
-@using GraphQLExample.GraphQL
-@inject GraphQLExampleClient Client
+@using GraphQLBlazorClient.Model
+@using GraphQLBlazorClient.Services
+@inject GraphService GraphService
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
@@ -46,7 +47,7 @@
             <div class="flex">
             @foreach (var book in _books)
             {
-                <BookCard AuthorName="@book.Author?.Name" BookTitle="@book.Title" LibraryName="@book.Library.Name" />
+                <BookCard AuthorName="@book.AuthorName" BookTitle="@book.Title" LibraryName="@book.LibraryName" />
             }
             </div>
         }
@@ -89,17 +90,17 @@
         <ul>
             @if (_book != null)
             {
-                <BookCard AuthorName="@_book.Author?.Name" BookTitle="@_book.Title" LibraryName="@_book.Library.Name" />
+                <BookCard AuthorName="@_book.AuthorName" BookTitle="@_book.Title" LibraryName="@_book.LibraryName" />
             }
         </ul>
     </div>
 </div>
 
 @code {
-    IReadOnlyList<IGetBooks_Books>? _books;
-    IReadOnlyList<IGetLibraries_Libraries>? _libraries;
-    IReadOnlyList<IGetAuthors_Authors>? _authors;
-    IGetBook_Book? _book;
+    List<Book>? _books;
+    List<Library>? _libraries;
+    List<Author>? _authors;
+    Book? _book;
 
     string _authorId;
     string _libraryId;
@@ -110,57 +111,23 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var librariesResult = await Client.GetLibraries.ExecuteAsync();
-        librariesResult.EnsureNoErrors();
-
-        _libraries = librariesResult.Data?.Libraries;
-        
-        var authorsResult = await Client.GetAuthors.ExecuteAsync();
-        authorsResult.EnsureNoErrors();
-
-        _authors = authorsResult.Data?.Authors;
+        _libraries = await GraphService.GetLibraries();
+        _authors = await GraphService.GetAuthors();
     }
 
     async Task GetBooks()
     {
-        var input = new BooksQueryInput();
-        input.Title = !string.IsNullOrEmpty(_queryTitle) ? _queryTitle : null;
-        input.AuthorId = !string.IsNullOrEmpty(_queryAuthor) ? _queryAuthor : null;
-        input.LibraryId = !string.IsNullOrEmpty(_queryLibrary) ? _queryLibrary : null;
-
-        var result = await Client.GetBooks.ExecuteAsync(input);
-
-        result.EnsureNoErrors();
-
-        _books = result.Data?.Books;
+        _books = await GraphService.GetBooks(_queryTitle, _queryAuthor, _queryLibrary);
     }
 
     async Task AddBook()
     {
-        var id = Guid.NewGuid().ToString();
-        var input = new BookInput
-        {
-            Id = id,
-            AuthorId = _authorId,
-            LibraryId = _libraryId,
-            Title = _title
-        };
-
-        await Client.AddBook.ExecuteAsync(input);
-        
+        var id = await GraphService.AddBook(_title, _authorId, _libraryId);
         await GetBookById(id);
     }
 
     async Task GetBookById(string id)
     {
-        var input = new BookQueryInput
-        {
-            Id = id
-        };
-
-        var result = await Client.GetBook.ExecuteAsync(input);
-        result.EnsureNoErrors();
-
-        _book = result.Data?.Book;
+        _book = await GraphService.GetBookById(id);
     }
 }
