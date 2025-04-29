@@ -4,11 +4,73 @@
     [Fact]
     public void ShouldInitializePage()
     {
+        // Mock the GraphService class that does the GraphQL interactions, and fake the initialization lists
         var graphServiceMock = new Mock<IGraphService>();
-        graphServiceMock.Setup(m => m.GetAuthors()).ReturnsAsync([]);
-        graphServiceMock.Setup(m => m.GetLibraries()).ReturnsAsync([]);
+        graphServiceMock.Setup(m => m.GetAuthors()).ReturnsAsync(
+        [
+            new Author("Author A", "AUTHOR1"),
+            new Author("Author B", "AUTHOR2"),
+        ]);
+        graphServiceMock.Setup(m => m.GetLibraries()).ReturnsAsync(
+        [
+            new Library("Library A", "LIBRARY1"),
+            new Library("Library B", "LIBRARY2")
+        ]);
 
+        // Add the mocked service to the Blazor context
         Services.AddSingleton(graphServiceMock.Object);
+        
+        // Render the Home component, which will also call the initialize routine
         var home = RenderComponent<Home>();
+        
+        // Spot check the author and library Select lists for expected elements
+        var authorOption = home.Find("option[value=AUTHOR1]");
+        Assert.NotNull(authorOption);
+        var libraryOption = home.Find("option[value=LIBRARY1]");
+        Assert.NotNull(libraryOption);
+        
+        // Assert that the mocked methods were called as expected
+        graphServiceMock.Verify(m => m.GetAuthors(), Times.Once);
+        graphServiceMock.Verify(m => m.GetLibraries(), Times.Once);
+    }
+
+    [Fact]
+    public async Task ShouldSearchForBooks()
+    {
+        // Mock the GraphService class that does the GraphQL interactions, and fake the initialization lists and book query
+        var graphServiceMock = new Mock<IGraphService>();
+        graphServiceMock.Setup(m => m.GetAuthors()).ReturnsAsync(
+        [
+            new Author("Author A", "AUTHOR1"),
+            new Author("Author B", "AUTHOR2"),
+        ]);
+        graphServiceMock.Setup(m => m.GetLibraries()).ReturnsAsync(
+        [
+            new Library("Library A", "LIBRARY1"),
+            new Library("Library B", "LIBRARY2")
+        ]);
+        graphServiceMock.Setup(m => m.GetBooks(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(
+        [
+            new Book("Book Title", "Author A", "Library A")
+        ]);
+        
+        // Add the mocked service to the Blazor context
+        Services.AddSingleton(graphServiceMock.Object);
+        
+        // Render the Home component, which will also call the initialize routine
+        var home = RenderComponent<Home>();
+
+        // Find the search button on the page, and trigger a click
+        await home.Find("button[id=get-books-button]").ClickAsync(new MouseEventArgs());
+        
+        // Verify that the book query is called after the button click, also verifies that the inputs are all null since no input was populated
+        graphServiceMock.Verify(m => m.GetBooks(null, null, null), Times.Once);
+        
+        // Re-render the component, which should have it reflect the book returned from the query
+        home.Render();
+
+        // Verify that the book shows on the page after the re-render
+        var bookCardHeader = home.Find("h4");
+        Assert.Equal("Book Title", bookCardHeader.TextContent);
     }
 }
