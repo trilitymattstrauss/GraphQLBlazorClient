@@ -4,9 +4,22 @@ using StrawberryShake;
 
 namespace GraphQLBlazorClient.Services;
 
-public class GraphService
+public interface IGraphService
 {
-    private readonly GraphQLExampleClient _client;
+    public Task<List<Library>?> GetLibraries();
+    public Task<List<Author>?> GetAuthors();
+    public Task<List<Book>?> GetBooks(string? title, string? authorId, string? libraryId);
+    public Task<Book?> GetBookById(string bookId);
+    public Task<string> AddBook(string title, string authorId, string libraryId);
+}
+
+public class GraphService : IGraphService
+{
+    private readonly GraphQLExampleClient? _client;
+
+    public GraphService()
+    {
+    }
 
     public GraphService(GraphQLExampleClient client)
     {
@@ -15,20 +28,30 @@ public class GraphService
 
     public async Task<List<Library>?> GetLibraries()
     {
-        var librariesResult = await _client.GetLibraries.ExecuteAsync();
+        var librariesResult = await _client?.GetLibraries.ExecuteAsync()!;
         librariesResult.EnsureNoErrors();
 
-        var libraries = librariesResult.Data?.Libraries;
+        if (librariesResult.Data == null)
+        {
+            return [];
+        }
+
+        var libraries = librariesResult.Data.Libraries;
 
         return libraries.Select(library => new Library(library.Name, library.Id)).ToList();
     }
 
     public async Task<List<Author>?> GetAuthors()
     {
-        var authorsResult = await _client.GetAuthors.ExecuteAsync();
+        var authorsResult = await _client?.GetAuthors.ExecuteAsync()!;
         authorsResult.EnsureNoErrors();
 
-        var authors = authorsResult.Data?.Authors;
+        if (authorsResult.Data == null)
+        {
+            return [];
+        }
+
+        var authors = authorsResult.Data.Authors;
 
         return authors.Select(author => new Author(author.Name, author.Id)).ToList();
     }
@@ -42,13 +65,18 @@ public class GraphService
             LibraryId = !string.IsNullOrEmpty(libraryId) ? libraryId : null
         };
 
-        var result = await _client.GetBooks.ExecuteAsync(input);
+        var result = await _client?.GetBooks.ExecuteAsync(input)!;
 
         result.EnsureNoErrors();
 
+        if (result.Data == null)
+        {
+            return [];
+        }
+
         var books = result.Data.Books;
 
-        return books.Select(book => new Book(book.Title, book.Author.Name, book.Library.Name)).ToList();
+        return books.Select(book => new Book(book.Title, book?.Author?.Name, book?.Library.Name)).ToList();
     }
 
     public async Task<Book?> GetBookById(string bookId)
@@ -58,12 +86,17 @@ public class GraphService
             Id = bookId
         };
 
-        var result = await _client.GetBook.ExecuteAsync(input);
+        var result = await _client?.GetBook.ExecuteAsync(input)!;
         result.EnsureNoErrors();
+
+        if (result.Data == null)
+        {
+            return null;
+        }
 
         var book = result.Data.Book;
         
-        return new Book(book.Title, book.Author.Name, book.Library.Name);
+        return new Book(book?.Title, book?.Author?.Name, book?.Library?.Name);
     }
 
     public async Task<string> AddBook(string title, string authorId, string libraryId)
@@ -77,7 +110,7 @@ public class GraphService
             Title = title
         };
 
-        await _client.AddBook.ExecuteAsync(input);
+        await _client?.AddBook.ExecuteAsync(input)!;
 
         return id;
     }

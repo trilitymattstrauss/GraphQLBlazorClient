@@ -1,0 +1,14 @@
+@inherits Bunit.TestContext
+
+@code {
+    [Fact]
+    public void ShouldInitializePage()
+    {
+        var graphServiceMock = new Mock<IGraphService>();
+        graphServiceMock.Setup(m => m.GetAuthors()).ReturnsAsync([]);
+        graphServiceMock.Setup(m => m.GetLibraries()).ReturnsAsync([]);
+
+        Services.AddSingleton(graphServiceMock.Object);
+        var home = RenderComponent<Home>();
+    }
+}

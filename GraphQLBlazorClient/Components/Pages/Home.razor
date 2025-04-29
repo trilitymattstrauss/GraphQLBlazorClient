@@ -1,7 +1,5 @@
 ﻿@page "/"
-@using GraphQLBlazorClient.Model
-@using GraphQLBlazorClient.Services
-@inject GraphService GraphService
+@inject IGraphService GraphService
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
@@ -102,9 +100,9 @@
     List<Author>? _authors;
     Book? _book;
 
-    string _authorId;
-    string _libraryId;
-    string _title;
+    string _authorId = null!;
+    string _libraryId = null!;
+    string _title = null!;
     string? _queryTitle;
     string? _queryAuthor;
     string? _queryLibrary;

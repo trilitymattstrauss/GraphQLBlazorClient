@@ -1,6 +1,4 @@
-using System.Text.RegularExpressions;
 using Xunit;
-using Microsoft.Playwright;
 using Microsoft.Playwright.Xunit;
 
 namespace GraphQLBlazorClient.Test;
