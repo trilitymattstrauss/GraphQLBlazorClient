@@ -5,7 +5,7 @@
     "strawberryShake": {
       "name": "GraphQLExampleClient",
       "namespace": "GraphQLExample.GraphQL",
-      "url": "http://localhost:4000",
+      "url": "http://host.docker.internal:4000",
       "records": {
         "inputs": false,
         "entities": false

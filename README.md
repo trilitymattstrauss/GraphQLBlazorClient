@@ -9,12 +9,16 @@ Example Blazor client utilizing GraphQL queries
 ln -s /usr/local/share/dotnet/x64/dotnet /usr/local/bin/
 ```
 * If done correctly, you should now have the dotnet command available in your terminal.
+* You will also need `npm` installed on your machine.
+* You will also need `Docker` installed and running.
+  * If you do NOT wish to use `Docker`, you will need to replace any occurrences of `host.docker.internal` with `localhost`, and run using `dotnet run`.
+  * TODO: Look into making the GraphQL API URL dynamic based on whether running in Docker or not
 * Ensure you are in the `GraphQLBlazorClient` sub-directory (not the root of the repository)
 * Run the command:
 ```
-dotnet run
+npm run publish
 ```
-* This should start up the web application, and is accessible from http://localhost:5152/
+* This should start up the web application, and is accessible from http://localhost:5152/.  This will also start the app in a container (which you can see in Docker)
 * In order for the GraphQL requests to work, you will also need to have the GraphQL APIs and Apollo router running (see https://github.com/trilitymattstrauss/GraphQLExample)
 
 # Playwright setup
@@ -30,8 +34,14 @@ dotnet run
 * To run the test suite, first ensure that the web app is up and running (you will also need the GraphQL API up)
 * Then run the following command to execute the tests:
 ```
-dotent test
+-- To run the Playwright tests:
+npm run test:acceptance
+-- To run the bUnit tests:
+npm run test:unit
 ```
+* The `npm run test:acceptance` script will stop any running containers, re-publish, then run the acceptance tests.
+  * A test is identified as an acceptance test if it has a namespace of `GraphQLBlazorClient.Acceptance`.
+  * Anything not in that namesapce is considered a unit test.
 * If you wish to run a specific test, you can apply a filter e.g.
 ```
 dotnet test --filter "FullyQualifiedName~HomePageTests"

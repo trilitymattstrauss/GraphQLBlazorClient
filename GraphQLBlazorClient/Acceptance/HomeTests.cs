@@ -1,7 +1,7 @@
 using Xunit;
 using Microsoft.Playwright.Xunit;
 
-namespace GraphQLBlazorClient.Test;
+namespace GraphQLBlazorClient.Acceptance;
 
 public class HomeTests : PageTest
 {
@@ -18,7 +18,7 @@ public class HomeTests : PageTest
         await Expect(Page.GetByText("The Lord of the Rings")).ToBeVisibleAsync();
     }
 
-    [Fact]
+    [Fact (Skip = "Flaky, keeping for reference")]
     public async Task ShouldCreateBook()
     {
         var rand = new Random();

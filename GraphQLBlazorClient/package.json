@@ -1,4 +1,12 @@
 {
+  "name": "graphqlblazorclient",
+  "scripts": {
+    "publish": "dotnet publish /t:PublishContainer && docker run --name graphqlblazorclient --rm -d -p 5152:8080 graphqlblazorclient",
+    "stop": "docker stop graphqlblazorclient && docker rmi graphqlblazorclient:latest",
+    "test:acceptance": "dotnet test --filter FullyQualifiedName~GraphQLBlazorClient.Acceptance",
+    "test:acceptance:full": "npm run stop ; npm run publish && npm run test:acceptance",
+    "test:unit": "dotnet test --filter FullyQualifiedName\\!~GraphQLBlazorClient.Acceptance"
+  },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.4",
     "tailwindcss": "^4.1.4"

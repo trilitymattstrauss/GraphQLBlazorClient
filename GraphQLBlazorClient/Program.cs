@@ -8,7 +8,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services
     .AddGraphQLExampleClient()
-    .ConfigureHttpClient(client => client.BaseAddress = new Uri("http://localhost:4000"));
+    .ConfigureHttpClient(client => client.BaseAddress = new Uri("http://host.docker.internal:4000"));
 builder.Services.AddSingleton<IGraphService, GraphService>();
 
 var app = builder.Build();
