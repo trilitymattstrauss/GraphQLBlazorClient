@@ -12,7 +12,7 @@ public class HomeTests : PageTest
         await Page.GotoAsync("http://localhost:5152");
         
         // Click the book query button on the rendered page
-        await Page.GetByTestId("get-books-button").ClickAsync();
+        await Page.GetByText("Get Books").ClickAsync();
 
         // Look for an expected book to appear on the page
         await Expect(Page.GetByText("The Lord of the Rings")).ToBeVisibleAsync();
@@ -28,12 +28,12 @@ public class HomeTests : PageTest
         await Page.GotoAsync("http://localhost:5152");
         
         // Fill in the form for adding the book
-        await Page.GetByTestId("create-book-title").FillAsync(title);
-        await Page.GetByTestId("create-book-author").SelectOptionAsync("JRR Tolkien");
-        await Page.GetByTestId("create-book-library").SelectOptionAsync("Memorial Library");
-        
+        await Page.Locator("input[name=\"AddBookInput.Title\"]").FillAsync(title);
+        await Page.Locator("select[name=\"AddBookInput.AuthorId\"]").SelectOptionAsync("JRR Tolkien");
+        await Page.Locator("select[name=\"AddBookInput.LibraryId\"]").SelectOptionAsync("Memorial Library");
+
         // Click the add button on the rendered page
-        await Page.GetByTestId("create-book-button").ClickAsync();
+        await Page.GetByText("Add Book").ClickAsync();
         
         // Look for an expected book to appear on the page
         await Expect(Page.GetByText(title)).ToBeVisibleAsync();

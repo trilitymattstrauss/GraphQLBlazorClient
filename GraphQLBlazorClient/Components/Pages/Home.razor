@@ -52,38 +52,35 @@
         }
     </div>
     <div class="col-span-1">
-        <div class="grid grid-cols-6 gap-4 border-2 p-2 rounded-2xl border-blue-500 bg-gray-200">
+        <EditForm Model="AddBookInput" OnValidSubmit="AddBook" FormName="AddBookForm" class="grid grid-cols-6 gap-4 border-2 p-2 rounded-2xl border-blue-500 bg-gray-200">
             <label class="col-span-1">Title</label>
-            <input type="text" @bind="_title" class="border col-span-5 bg-white" data-testid="create-book-title"/>
+            <InputText @bind-value="AddBookInput!.Title" class="border col-span-5 bg-white" />
             <label class="col-span-1">Author</label>
-            <select @bind="_authorId" class="border col-span-5 bg-white" data-testid="create-book-author">
-                <option></option>
+            <InputSelect @bind-Value="AddBookInput!.AuthorId" class="border col-span-5 bg-white">
+                <option value="">Select an Author</option>
                 @if (_authors != null)
                 {
                     @foreach (var author in _authors)
                     {
-                        <option value="@author.Id">@author.Name</option>
+                        <option selected="@(AddBookInput!.AuthorId == author.Id)" value="@author.Id">@author.Name</option>
                     }
                 }
-            </select>
+            </InputSelect>
             <label class="col-span-1">Library</label>
-            <select @bind="_libraryId" class="border col-span-5 bg-white" data-testid="create-book-library">
-                <option></option>
+            <InputSelect @bind-value="AddBookInput!.LibraryId" class="border col-span-5 bg-white">
+                <option value="">Select a Library</option>
                 @if (_libraries != null)
                 {
                     @foreach (var library in _libraries)
                     {
-                        <option value="@library.Id">@library.Name</option>
+                        <option selected="@(AddBookInput!.LibraryId == library.Id)" value="@library.Id">@library.Name</option>
                     }
                 }
-            </select>
-            <button
-                class="col-span-2 col-start-5 mt-1 mb-1 font-bold py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-700"
-                @onclick="AddBook"
-                data-testid="create-book-button">
+            </InputSelect>
+            <button type="submit" class="col-span-2 col-start-5 mt-1 mb-1 font-bold py-2 px-4 rounded cursor-pointer bg-blue-500 text-white hover:bg-blue-700">
                 Add Book
             </button>
-        </div>
+        </EditForm>
     </div>
     <div class="col-span-5 border-2 p-2 rounded-2xl border-blue-500 bg-gray-200">
         <ul>
@@ -101,9 +98,8 @@
     List<Author>? _authors;
     Book? _book;
 
-    string _authorId = null!;
-    string _libraryId = null!;
-    string _title = null!;
+    [SupplyParameterFromForm] private BookInput AddBookInput { get; set; } = new();
+
     string? _queryTitle;
     string? _queryAuthor;
     string? _queryLibrary;
@@ -121,7 +117,8 @@
 
     async Task AddBook()
     {
-        var id = await GraphService.AddBook(_title, _authorId, _libraryId);
+        Console.WriteLine("Adding Book: [" + AddBookInput.Title + ", " + AddBookInput.AuthorId + ", " + AddBookInput.LibraryId + "]");
+        var id = await GraphService.AddBook(AddBookInput.Title, AddBookInput.AuthorId, AddBookInput.LibraryId);
         await GetBookById(id);
     }
 

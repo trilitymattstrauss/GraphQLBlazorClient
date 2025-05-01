@@ -1,6 +1,7 @@
 using GraphQLBlazorClient.Model;
 using GraphQLExample.GraphQL;
 using StrawberryShake;
+using BookInput = GraphQLExample.GraphQL.BookInput;
 
 namespace GraphQLBlazorClient.Services;
 
