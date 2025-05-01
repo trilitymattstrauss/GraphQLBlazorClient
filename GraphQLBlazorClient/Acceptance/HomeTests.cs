@@ -18,7 +18,7 @@ public class HomeTests : PageTest
         await Expect(Page.GetByText("The Lord of the Rings")).ToBeVisibleAsync();
     }
 
-    [Fact (Skip = "Flaky, keeping for reference")]
+    [Fact]
     public async Task ShouldCreateBook()
     {
         var rand = new Random();
